@@ -22,7 +22,7 @@ Other required python libraries:numpy,tqdm,sklearn,pickle etc.
 Usages
 ------
 
-### Instagram Check-in Toy Dataset
+### LFM User group dataset
 Train and evaluate the model (you are strongly recommended to run the program on a machine with GPU)
 
     python mainLFM.py 
