@@ -9,19 +9,19 @@ class Data_process:
     def __init__(self, args):
         data_path = os.getcwd() + '/dataset-LFM/'
 
-        ny_checkin_path = data_path + 'eventsModified.txt'
-        ny_demo_path = data_path + 'usersModified.txt'
-        ny_vcat_path = data_path + 'tracksModified.txt'
+        Events_path = data_path + 'eventsModified.txt'
+        Users_path = data_path + 'usersModified.txt'
+        tracks_path = data_path + 'tracksModified.txt'
 
-        self.ny_vcat = open(ny_vcat_path, 'r').readlines()
-        self.ny_checkin = open(ny_checkin_path, 'r').readlines()
-        self.ny_demo = open(ny_demo_path, 'r').readlines()
+        self.tracks = open(tracks_path, 'r').readlines()
+        self.Events = open(Events_path, 'r').readlines()
+        self.Users = open(Users_path, 'r').readlines()
 
         self.dict_restrict = {
             'year': [2012, 2013, 2014],
             'num_checkin': 10,
             'test_X_num': args.L_hgn,
-            'test_Y_num': 20,
+            'test_Y_num': 10,
         }
         self.L_hgn, self.T_hgn = args.L_hgn, args.T_hgn
         self.args = args
@@ -29,77 +29,77 @@ class Data_process:
     def run(self):
         print('/1')
         index, r_index = 0, 0
-        dict_locid_catid, dict_catid_to_index, dict_r_catid_to_index = {}, {}, {}
-        for ny_vcat_i in self.ny_vcat[1:]:
+        dict_trackid_catid, dict_catid_to_index, dict_r_catid_to_index = {}, {}, {}
+        for ny_vcat_i in self.tracks[1:]:
             ny_vcat_i = ny_vcat_i.split(';')
-            locid_ = ny_vcat_i[0]
+            trackid_ = ny_vcat_i[0]
             catid_ = ny_vcat_i[2]
-            if locid_ not in dict_locid_catid:
-                dict_locid_catid[locid_] = (catid_, int(catid_))
+            if trackid_ not in dict_trackid_catid:
+                dict_trackid_catid[trackid_] = (catid_, int(catid_))
                 if catid_ not in dict_catid_to_index:
                     dict_catid_to_index[catid_] = index
                     index += 1
                 if int(catid_) not in dict_r_catid_to_index:
                     dict_r_catid_to_index[int(catid_)] = r_index
                     r_index += 1
-        set_locid_name = set(dict_locid_catid.keys())
-        locid_name = list(set(dict_locid_catid.keys()))
+        set_trackid_name = set(dict_trackid_catid.keys())
+        trackid_name = list(set(dict_trackid_catid.keys()))
         catid_set = list(set(dict_catid_to_index.values()))
         relation_catid_set = list(set(dict_r_catid_to_index.values()))
-        # print(set_locid_name)
-        # print(locid_name)
+        # print(set_trackid_name)
+        # print(trackid_name)
         # print(catid_set)
         # print(relation_catid_set)
         print('/2')
-        for i in range(len(locid_name)):
-            locid_catid_ = dict_locid_catid[locid_name[i]]
-            index_ = dict_catid_to_index[locid_catid_[0]]
-            r_index_ = dict_r_catid_to_index[locid_catid_[1]]
-            dict_locid_catid[locid_name[i]] = (index_, r_index_)
-        # print(locid_catid_)
+        for i in range(len(trackid_name)):
+            trackid_catid_ = dict_trackid_catid[trackid_name[i]]
+            index_ = dict_catid_to_index[trackid_catid_[0]]
+            r_index_ = dict_r_catid_to_index[trackid_catid_[1]]
+            dict_trackid_catid[trackid_name[i]] = (index_, r_index_)
+        # print(trackid_catid_)
         # print(index_)
         # print(r_index_)
-        # print(dict_locid_catid)
+        # print(dict_trackid_catid)
         print('/3')
-        dict_uid_category, uid_category_set, gender_set, race_set = {}, [], [], []
-        for ny_demo_i in self.ny_demo[1:]:
+        dict_uid_category, uid_category_set, gender_set, MS_set = {}, [], [], []
+        for ny_demo_i in self.Users[1:]:
             ny_demo_i = ny_demo_i.split(';')
             uid_ = ny_demo_i[0]
             gender_ = int(ny_demo_i[3])
-            race_ = int(ny_demo_i[4].strip('\n'))
+            MS_ = int(ny_demo_i[4].strip('\n'))
             category_ = int(ny_demo_i[1])
-            dict_uid_category[uid_] = (category_, (gender_, race_))
+            dict_uid_category[uid_] = (category_, (gender_, MS_))
             uid_category_set.append(category_)
             gender_set.append(gender_)
-            race_set.append(race_)
+            MS_set.append(MS_)
         uid_category_set = list(set(uid_category_set))
         uid_name = set(dict_uid_category.keys())
         self.gender_set = list(set(gender_set))
-        self.race_set = list(set(race_set))
+        self.MS_set = list(set(MS_set))
         print('/4')
-        dict_uid_time_locid = {}
-        for i in range(len(self.ny_checkin) - 1):
-            ny_checkin_i = self.ny_checkin[i + 1].split(';')
-            uid_, time_, locid_ = ny_checkin_i[0], ny_checkin_i[4].strip('\n'), ny_checkin_i[3]
+        dict_uid_time_trackid = {}
+        for i in range(len(self.Events) - 1):
+            ny_checkin_i = self.Events[i + 1].split(';')
+            uid_, time_, trackid_ = ny_checkin_i[0], ny_checkin_i[4].strip('\n'), ny_checkin_i[3]
             time_day, time_hms = time_.split()[0], time_.split()[1]
-            if uid_ in uid_name and locid_ in set_locid_name:
+            if uid_ in uid_name and trackid_ in set_trackid_name:
                 year_ = int(time_day.split('-')[0])
                 if year_ in self.dict_restrict['year']:
-                    if uid_ not in dict_uid_time_locid:
-                        dict_uid_time_locid[uid_] = [(time_day, time_hms, locid_)]
+                    if uid_ not in dict_uid_time_trackid:
+                        dict_uid_time_trackid[uid_] = [(time_day, time_hms, trackid_)]
                     else:
-                        dict_uid_time_locid[uid_].append((time_day, time_hms, locid_))
-        print(dict_uid_time_locid)
+                        dict_uid_time_trackid[uid_].append((time_day, time_hms, trackid_))
+        print(dict_uid_time_trackid)
         print('/5')
-        uid_name = list(set(dict_uid_time_locid.keys()))
-        dict_uid_locid_relation, dict_locid_to_entity, index = {}, {}, 0
+        uid_name = list(set(dict_uid_time_trackid.keys()))
+        dict_uid_trackid_relation, dict_trackid_to_entity, index = {}, {}, 0
         for u_i in range(len(uid_name)):
-            uid_time_locid_ = dict_uid_time_locid[uid_name[u_i]]
-            if len(uid_time_locid_) >= self.dict_restrict['num_checkin']:
-                sorted_uid_time_locid_ = sorted(uid_time_locid_)
-                for i in range(len(sorted_uid_time_locid_)):
-                    time_day_, time_hms_, locid_ = sorted_uid_time_locid_[i][0], sorted_uid_time_locid_[i][1], \
-                                                   sorted_uid_time_locid_[i][2]
+            uid_time_trackid_ = dict_uid_time_trackid[uid_name[u_i]]
+            if len(uid_time_trackid_) >= self.dict_restrict['num_checkin']:
+                sorted_uid_time_trackid_ = sorted(uid_time_trackid_)
+                for i in range(len(sorted_uid_time_trackid_)):
+                    time_day_, time_hms_, trackid_ = sorted_uid_time_trackid_[i][0], sorted_uid_time_trackid_[i][1], \
+                                                     sorted_uid_time_trackid_[i][2]
                     daynum_time_day_ = int(time_day_.split('-')[1]) - 1
                     time_h = int(time_hms_.split('-')[0].split(':')[0])
                     if time_h > 11:
@@ -107,26 +107,27 @@ class Data_process:
                     else:
                         time_h = 0
                     relation_time = time_h * daynum_time_day_ + daynum_time_day_
-                    sorted_uid_time_locid_[i] = (locid_, relation_time)
-                    if locid_ not in dict_locid_to_entity:
-                        dict_locid_to_entity[locid_] = index
+                    sorted_uid_time_trackid_[i] = (trackid_, 0)
+                    if trackid_ not in dict_trackid_to_entity:
+                        dict_trackid_to_entity[trackid_] = index
                         index += 1
-                dict_uid_locid_relation[uid_name[u_i]] = sorted_uid_time_locid_
-        uid_name = list(set(dict_uid_locid_relation.keys()))
-        locid_name = list(set(dict_locid_to_entity.keys()))
+                dict_uid_trackid_relation[uid_name[u_i]] = sorted_uid_time_trackid_
+        uid_name = list(set(dict_uid_trackid_relation.keys()))
+        trackid_name = list(set(dict_trackid_to_entity.keys()))
         print('/6')
         test_X_num = self.dict_restrict['test_X_num']
         test_Y_num = self.dict_restrict['test_Y_num']
         train_set, test_set, test_X_set, test_Y_set, relation_time_set, data_set = [], [], [], [], [], []
         for i in range(len(uid_name)):
-            uid_locid_relation_ = dict_uid_locid_relation[uid_name[i]]
+            uid_trackid_relation_ = dict_uid_trackid_relation[uid_name[i]]
+            print("uid_trackid_relation_: ",uid_trackid_relation_)
             data_set_, catid_set_ = [], []
-            for j in range(len(uid_locid_relation_)):
-                locid_ = uid_locid_relation_[j][0]
-                catid_ = dict_locid_catid[locid_][0]
-                entity_locid_ = dict_locid_to_entity[locid_]
-                relation_time_ = uid_locid_relation_[j][1]
-                data_set_.append(entity_locid_)
+            for j in range(len(uid_trackid_relation_)):
+                trackid_ = uid_trackid_relation_[j][0]
+                catid_ = dict_trackid_catid[trackid_][0]
+                entity_trackid_ = dict_trackid_to_entity[trackid_]
+                relation_time_ = uid_trackid_relation_[j][1]
+                data_set_.append(entity_trackid_)
                 relation_time_set.append(relation_time_)
                 catid_set_.append(catid_)
             data_set.append(data_set_)
@@ -140,7 +141,7 @@ class Data_process:
             test_Y_set.append(test_Y_set_)
         self.test_X_set = np.array(test_X_set)
         relation_time_set = list(set(relation_time_set))
-        entity_set = list(set(dict_locid_to_entity.values()))
+        entity_set = list(set(dict_trackid_to_entity.values()))
         print('/7')
         dict_uid_category_to_entity = {}
         for i in range(len(uid_category_set)):
@@ -156,45 +157,45 @@ class Data_process:
         for i in range(len(uid_name)):
             uid_category_, uid_category_detail_ = dict_uid_category[uid_name[i]]
             entity_uid_category_ = dict_uid_category_to_entity[uid_category_]
-            uid_locid_relation_ = dict_uid_locid_relation[uid_name[i]]
-            gender_, race_ = uid_category_detail_[0], uid_category_detail_[1]
-            self.uid_attribute_category.append((gender_, race_))
-            for j in range(len(uid_locid_relation_)):
-                locid_ = uid_locid_relation_[j][0]
-                relation_time_ = uid_locid_relation_[j][1]
-                entity_locid_ = dict_locid_to_entity[locid_]
-                catid_, relation_catid_ = dict_locid_catid[locid_][0], dict_locid_catid[locid_][1]
+            uid_trackid_relation_ = dict_uid_trackid_relation[uid_name[i]]
+            gender_, MS_ = uid_category_detail_[0], uid_category_detail_[1]
+            self.uid_attribute_category.append((gender_, MS_))
+            for j in range(len(uid_trackid_relation_)):
+                trackid_ = uid_trackid_relation_[j][0]
+                relation_time_ = uid_trackid_relation_[j][1]
+                entity_trackid_ = dict_trackid_to_entity[trackid_]
+                catid_, relation_catid_ = dict_trackid_catid[trackid_][0], dict_trackid_catid[trackid_][1]
                 entity_catid_ = dict_catid_to_entity[catid_]
                 relation_catid_ = dict_relation_catid_to_r[relation_catid_]
-                if entity_locid_ not in self.dict_KG:
-                    self.dict_KG[entity_locid_] = {}
+                if entity_trackid_ not in self.dict_KG:
+                    self.dict_KG[entity_trackid_] = {}
                     for k in range(len(self.gender_set)):
-                        self.dict_KG[entity_locid_]['gender' + '-' + str(self.gender_set[k])] = []
+                        self.dict_KG[entity_trackid_]['gender' + '-' + str(self.gender_set[k])] = []
                         if self.gender_set[k] == gender_:
-                            self.dict_KG[entity_locid_]['gender' + '-' + str(self.gender_set[k])].append(
-                                [entity_locid_, relation_time_, entity_uid_category_])
-                            self.dict_KG[entity_locid_]['gender' + '-' + str(self.gender_set[k])].append(
-                                [entity_locid_, relation_catid_, entity_catid_])
-                    for k in range(len(self.race_set)):
-                        self.dict_KG[entity_locid_]['race' + '-' + str(self.race_set[k])] = []
-                        if self.race_set[k] == race_:
-                            self.dict_KG[entity_locid_]['race' + '-' + str(self.race_set[k])].append(
-                                [entity_locid_, relation_time_, entity_uid_category_])
-                            self.dict_KG[entity_locid_]['race' + '-' + str(self.race_set[k])].append(
-                                [entity_locid_, relation_catid_, entity_catid_])
+                            self.dict_KG[entity_trackid_]['gender' + '-' + str(self.gender_set[k])].append(
+                                [entity_trackid_, relation_time_, entity_uid_category_])
+                            self.dict_KG[entity_trackid_]['gender' + '-' + str(self.gender_set[k])].append(
+                                [entity_trackid_, relation_catid_, entity_catid_])
+                    for k in range(len(self.MS_set)):
+                        self.dict_KG[entity_trackid_]['MS' + '-' + str(self.MS_set[k])] = []
+                        if self.MS_set[k] == MS_:
+                            self.dict_KG[entity_trackid_]['MS' + '-' + str(self.MS_set[k])].append(
+                                [entity_trackid_, relation_time_, entity_uid_category_])
+                            self.dict_KG[entity_trackid_]['MS' + '-' + str(self.MS_set[k])].append(
+                                [entity_trackid_, relation_catid_, entity_catid_])
                 else:
                     for k in range(len(self.gender_set)):
                         if self.gender_set[k] == gender_:
-                            self.dict_KG[entity_locid_]['gender' + '-' + str(self.gender_set[k])].append(
-                                [entity_locid_, relation_time_, entity_uid_category_])
-                            self.dict_KG[entity_locid_]['gender' + '-' + str(self.gender_set[k])].append(
-                                [entity_locid_, relation_catid_, entity_catid_])
-                    for k in range(len(self.race_set)):
-                        if self.race_set[k] == race_:
-                            self.dict_KG[entity_locid_]['race' + '-' + str(self.race_set[k])].append(
-                                [entity_locid_, relation_time_, entity_uid_category_])
-                            self.dict_KG[entity_locid_]['race' + '-' + str(self.race_set[k])].append(
-                                [entity_locid_, relation_catid_, entity_catid_])
+                            self.dict_KG[entity_trackid_]['gender' + '-' + str(self.gender_set[k])].append(
+                                [entity_trackid_, relation_time_, entity_uid_category_])
+                            self.dict_KG[entity_trackid_]['gender' + '-' + str(self.gender_set[k])].append(
+                                [entity_trackid_, relation_catid_, entity_catid_])
+                    for k in range(len(self.MS_set)):
+                        if self.MS_set[k] == MS_:
+                            self.dict_KG[entity_trackid_]['MS' + '-' + str(self.MS_set[k])].append(
+                                [entity_trackid_, relation_time_, entity_uid_category_])
+                            self.dict_KG[entity_trackid_]['MS' + '-' + str(self.MS_set[k])].append(
+                                [entity_trackid_, relation_catid_, entity_catid_])
 
         self.dict_itemid_upfdf = dict()
         self.dict_itemid_eav = dict()
@@ -208,7 +209,7 @@ class Data_process:
         itemid_name = list(set(self.dict_itemid_upfdf.keys()))
         for i in range(len(itemid_name)):
             itemid_upfdf_ = self.dict_itemid_upfdf[itemid_name[i]]
-            print(itemid_upfdf_)
+            # print(itemid_upfdf_)
             b_0, b_1, b_2,b_3, b_4, b_5,b_6, b_7, b_8,b_9= 0, 0, 0, 0, 0, 0,0, 0, 0, 0
             g_0, g_1, g_2,g_3, g_4, g_5,g_6, g_7, g_8,g_9= 0, 0, 0, 0, 0, 0,0, 0, 0, 0
             for j in range(len(itemid_upfdf_)):
@@ -263,8 +264,8 @@ class Data_process:
                 if pv != 0:
                     self.dict_itemid_eav[itemid_name[i]] += pv * math.log(pv, 10)
             self.dict_itemid_eav[itemid_name[i]] = abs(-1 * self.dict_itemid_eav[itemid_name[i]])
-        print("dict item pv: ", self.dict_itemid_upfdf)
-        print("dict item eav: ", self.dict_itemid_eav)
+        # print("dict item pv: ", self.dict_itemid_upfdf)
+        # print("dict item eav: ", self.dict_itemid_eav)
         num_user = len(uid_name)
         num_item = len(entity_set)
         n_entities = len(entity_set) + len(uid_category_set) + len(catid_set)
@@ -299,9 +300,12 @@ class Data_process:
                 test_data.append([uid_, test_set[i][j], 1])
                 test_data.append([uid_, neg_test_set_[j], 0])
         train_data = np.array(train_data)
+        # print("train_data: ",train_data)
+
         eval_data = train_data
         test_data = np.array(test_data)
-
+        # print("test_data: ", test_data)
+        # print("sequences_np: ", sequences_np)
         user_history_dict = dict()
         for i in range(len(data_set)):
             uid_ = i

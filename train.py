@@ -80,8 +80,8 @@ class Train:
         # for i in self.sequences_np:
         #     print(i)
 
-        # print("n_train RS:",n_train)
-        # print("n_test RS:",len(self.test_[1]))
+        print("n_train RS:",n_train)
+        print("n_test RS:",len(self.test_[1]))
         record_indexes = np.arange(n_train)
         np.random.shuffle(record_indexes)
         batch_size = self.args.batch_size
@@ -140,7 +140,8 @@ class Train:
         self.test_model.train()
         h_set = list(set(kg.keys()))
         n_train = len(h_set)
-        # print("n_train KG:",n_train)
+        print("KG: ",kg)
+        print("n_train KG:",n_train)
         record_indexes = np.arange(n_train)
         np.random.shuffle(record_indexes)
         num_batches = int(n_train / batch_size_) + 1

@@ -82,6 +82,7 @@ class Data_process:
                         dict_uid_time_locid[uid_].append((time_day,time_hms,locid_))
         print(dict_uid_time_locid)
         print('/5')
+        # har kar bar ba har loc id dar che time ertbat dashte be onvan relation extract shode
         uid_name = list(set(dict_uid_time_locid.keys()))
         dict_uid_locid_relation,dict_locid_to_entity,index = {},{},0
         for u_i in range(len(uid_name)):
@@ -104,6 +105,7 @@ class Data_process:
                 dict_uid_locid_relation[uid_name[u_i]] = sorted_uid_time_locid_
         uid_name = list(set(dict_uid_locid_relation.keys()))
         locid_name = list(set(dict_locid_to_entity.keys()))
+        print("dict_uid_locid_relation: ",dict_uid_locid_relation)
         print('/6')
         test_X_num = self.dict_restrict['test_X_num']
         test_Y_num = self.dict_restrict['test_Y_num']
@@ -252,8 +254,9 @@ class Data_process:
                 test_data.append([uid_,neg_test_set_[j],0])    
         train_data = np.array(train_data) 
         eval_data = train_data 
-        test_data = np.array(test_data)  
-
+        test_data = np.array(test_data)
+        print("train_data: ", train_data)
+        print("test_data: ", test_data)
         user_history_dict = dict() 
         for i in range(len(data_set)):
             uid_ = i
@@ -273,6 +276,7 @@ class Data_process:
         return param_,data_,test_,eav
     def KG_random_generator_(self):
         dict_KG = self.dict_KG
+
         list_entity = list(set(dict_KG.keys()))
         KG = []
         for i in range(len(list_entity)):
@@ -281,11 +285,14 @@ class Data_process:
                 KG_ = dict_KG[list_entity[i]][attribute_category[j]]  
                 KG += KG_  
         KG = np.array(KG)
+
         return KG
     
     def KG_random_generator(self):
         dict_KG = self.dict_KG
+        print("dict_KG: ",dict_KG)
         list_entity = list(set(dict_KG.keys()))
+        print("list_entity: ",list_entity)
         KG = dict()
         for i in range(len(list_entity)):
             if list_entity[i] not in KG:
@@ -300,6 +307,7 @@ class Data_process:
                         KG[list_entity[i]].append(KG_[j])
                     key = False
             KG[list_entity[i]] = np.array(KG[list_entity[i]])
+        print("KG: ", KG)
         return KG
 
 
