@@ -21,7 +21,7 @@ class Data_process:
             'year': [2012, 2013, 2014],
             'num_checkin': 10,
             'test_X_num': args.L_hgn,
-            'test_Y_num': 10,
+            'test_Y_num': 20,
         }
         self.L_hgn, self.T_hgn = args.L_hgn, args.T_hgn
         self.args = args
