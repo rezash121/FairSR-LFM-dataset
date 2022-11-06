@@ -22,9 +22,9 @@ Other required python libraries:numpy,tqdm,sklearn,pickle etc.
 Usages
 ------
 
-### Instagram Check-in Toy Dataset
+### LFM User group dataset
 Train and evaluate the model (you are strongly recommended to run the program on a machine with GPU)
 
-    python main.py 
+    python mainLFM.py 
 
-The results will show the performance of FairSR by ranking metric Precision@k, NDCG@k and Recall@k.
+The results will show the performance of FairSR by ranking metric Precision@k, NDCG@k, Recall@k and DIF@k.
