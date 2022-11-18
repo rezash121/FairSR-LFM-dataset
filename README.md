@@ -8,6 +8,7 @@ LFM User group [dataset](https://zenodo.org/record/3475975#.Y3fmMctBxBZ)
 Usages
 ------
 Train and evaluate the model
+
     python mainLFM.py 
 
 The results will show the performance of FairSR by ranking metric Precision@k, NDCG@k, Recall@k and DIF@k.
